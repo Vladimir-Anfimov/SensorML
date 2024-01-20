@@ -1,39 +1,56 @@
 import './App.css';
 import { useState } from 'react';
+import { PlotFigure } from './components/composed/plot-figure';
 import { Button } from './components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from './components/ui/dropdown-menu';
+import { useNavigate } from 'react-router-dom';
 
 function App() {
-  const [model, setModel] = useState('Prophet');
+  const navigate = useNavigate();
+
+  const models = ['Prophet', 'LSTM', 'Seq2Seq'];
+  const [model, setModel] = useState(models[0]);
 
   return (
     <>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant='outline'>{model}</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className='w-56'>
-          <DropdownMenuLabel>Panel Position</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <DropdownMenuRadioGroup value={model} onValueChange={setModel}>
-            <DropdownMenuRadioItem value='LSTM'>LSTM</DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='Prophet'>
-              Prophet
-            </DropdownMenuRadioItem>
-            <DropdownMenuRadioItem value='Seq2Seq'>
-              Seq2Seq
-            </DropdownMenuRadioItem>
-          </DropdownMenuRadioGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <h1 className='text-5xl font-bold mb-8 mt-16'>How are your tomatoes?</h1>
+      <p className='text-xl mb-16'>
+        Check out our app to check the health of your tomatoes. <br />
+        We trained our models on 2 years worth of data so you can see how
+        healthy are your tomatoes.
+      </p>
+      <Button
+        variant='default'
+        className='mb-32 text-lg font-bold py-6 px-8'
+        onClick={() => navigate('/diagnose')}
+      >
+        Try with your data
+      </Button>
+      <div className='flex flex-col items-center mb-8'>
+        <PlotFigure
+          className='mb-8'
+          model={model}
+          setModel={setModel}
+          models={models}
+        />
+        <PlotFigure
+          className='mb-8'
+          model={model}
+          setModel={setModel}
+          models={models}
+        />
+        <PlotFigure
+          className='mb-8'
+          model={model}
+          setModel={setModel}
+          models={models}
+        />
+        <PlotFigure
+          className='mb-8'
+          model={model}
+          setModel={setModel}
+          models={models}
+        />
+      </div>
     </>
   );
 }
