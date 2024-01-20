@@ -2,6 +2,8 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 
+from params import NORMALIZED_PARAMS_NAMES
+
 device = torch.device('cpu')
 
 OUTPUT_SIZE = 30
@@ -88,7 +90,7 @@ def start(PREDICTED_COLUMN):
 
     train(model, dataloader, criterion, optimizer, epochs=5)
 
-    torch.save(model.state_dict(), f'./models/model-rnn-lstm-EXP_{PREDICTED_COLUMN}-OS{OUTPUT_SIZE}-WS{WINDOW_SIZE}.pth')
+    torch.save(model.state_dict(), f'./models/lstm/{PREDICTED_COLUMN}-OS_{OUTPUT_SIZE}-WS_{WINDOW_SIZE}.pth')
 
     test_dataloader = DataLoader(dataset, batch_size=len(dataset), shuffle=False)
 
@@ -97,7 +99,12 @@ def start(PREDICTED_COLUMN):
     # test_denormalize(model, test_dataloader, criterion, max_value, min_value)
     
 if __name__ == '__main__':
-    atribute = ["sin_month","cos_month","sin_day","cos_day","sin_hour","cos_hour"]
+    input_answer = input('Are you sure you want to train the RNN LSTM model? (y/n) ')
 
-    for column in atribute:
-        start(column)
+    if input_answer.lower() == 'y':
+        print('Ok, let\'s go!')
+        for column in NORMALIZED_PARAMS_NAMES:
+            print(f'Training {column}...')
+            start(column)
+    else:
+        print('Ok, bye!')

@@ -3,7 +3,7 @@ import pandas as pd
 import torch
 from rnn_train import RecurentNeuralNetwork
 
-model_path = "./models/model-rnn-lstm-EXP_pres-OS30-WS7.pth"
+model_path = "./models/lstm/pres_OS30_WS7.pth"
 
 model = RecurentNeuralNetwork()
 model.load_state_dict(torch.load(model_path))
