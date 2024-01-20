@@ -66,3 +66,13 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+div:has(div[id^='matplotlib'][id$='top']) {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  background-color: orange;
+  border-radius: 20px;
+}
