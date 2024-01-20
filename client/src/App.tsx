@@ -3,16 +3,8 @@ import './App.css';
 function App() {
   return (
     <>
-      <h1>Polyglot 🦜 💬 🇬🇧 ➡️ 🏴‍☠️</h1>
-      <p>Translate English into Pirate speak...</p>
-      <input
-        type='text'
-        name='english'
-        id='english'
-        placeholder='Type English here...'
-      />
-      <button py-click='translate_english'>Translate</button>
-      <div id='output'></div>
+      <button py-click='show_plot'>Show Plot</button>
+      <p>You have to wait for pyscript to load</p>
     </>
   );
 }
