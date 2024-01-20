@@ -1,6 +1,7 @@
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader
+from data_frames import FrameLoader
 
 from params import NORMALIZED_PARAMS_NAMES
 
@@ -62,15 +63,15 @@ def test(model, dataloader, criterion):
             print(f'Error: {error.item():.4f}')
 
 
-def test_denormalize(model, dataloader, criterion, max_value, min_value):
-    with torch.no_grad():
-        for i, (x, y) in enumerate(dataloader):
-            output = model(x)
-            denormalized_output = output * (max_value - min_value) + min_value
-            denormalized_y = y * (max_value - min_value) + min_value
+# def test_denormalize(model, dataloader, criterion, max_value, min_value):
+#     with torch.no_grad():
+#         for i, (x, y) in enumerate(dataloader):
+#             output = model(x)
+#             denormalized_output = output * (max_value - min_value) + min_value
+#             denormalized_y = y * (max_value - min_value) + min_value
 
-            error = criterion(denormalized_output, denormalized_y)
-            print(f'Error (denormalized): {error.item():.4f}')
+#             error = criterion(denormalized_output, denormalized_y)
+#             print(f'Error (denormalized): {error.item():.4f}')
 
 
 
@@ -80,7 +81,8 @@ def start(PREDICTED_COLUMN):
     # min_value = df_raw[PREDICTED_COLUMN].min()
     # max_value = df_raw[PREDICTED_COLUMN].max()
 
-    df = pd.read_csv('./data/normalized_data.csv')
+    dataframe_loader = FrameLoader(FrameLoader.NORMALIZED)
+    df = dataframe_loader.load()
     
     model = RecurentNeuralNetwork().to(device)
     criterion = torch.nn.L1Loss()
@@ -97,6 +99,8 @@ def start(PREDICTED_COLUMN):
     test(model, test_dataloader, criterion)
 
     # test_denormalize(model, test_dataloader, criterion, max_value, min_value)
+    
+
     
 if __name__ == '__main__':
     input_answer = input('Are you sure you want to train the RNN LSTM model? (y/n) ')

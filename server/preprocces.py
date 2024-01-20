@@ -2,8 +2,11 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import MinMaxScaler
 
+from data_frames import FrameLoader
+
 def load():
-    df = pd.read_csv('./data/raw_data.csv')
+    dataframe_loader = FrameLoader(FrameLoader.RAW)
+    df = dataframe_loader.load()
     return df
 
 def normalize(df):
