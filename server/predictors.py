@@ -87,8 +87,25 @@ if __name__ == '__main__':
 
     for column in predicted.columns[1:]:
         plt.figure(figsize=(10, 6))
-        plt.plot(df['Timestamp'], df[column].astype('float32'), 'g.', label='Expected values')
-        plt.plot(predicted['Timestamp'], predicted[column].astype('float32'), 'b.', label='Predicted values')
+        plt.plot(df['Timestamp'], df[column].astype('float32'), '#181818', label='Your values')
+        plt.plot(predicted['Timestamp'], predicted[column].astype('float32'), '#181818', label='Predicted values')
+        plt.legend()
+        plt.title(f'Forecast for the parameter \'{column}\' using Lstm')
+        plt.savefig(f'images/seq2seq/seq2seq_{column}.png')
+        plt.close()
+
+    predictor = LstmPredictorNormalized()
+    predicted = predictor.predict(df, 128)
+
+    save_dir = 'images/lstm/'
+    os.makedirs(save_dir, exist_ok=True)
+
+    for column in predicted.columns[1:]:
+        plt.figure(figsize=(10, 6))
+        plt.plot(df['Timestamp'], df[column].astype('float32'), '#181818', label='Your values')
+        plt.plot(predicted['Timestamp'], predicted[column].astype('float32'), '#181818', label='Predicted values')
         plt.legend()
         plt.title(f'Forecast for the parameter \'{column}\' using Seq2Seq')
-        plt.savefig(f'images/seq2seq/seq2seq_{column}.png')
+        plt.savefig(f'images/lstm/lstm_{column}.png')
+
+    
