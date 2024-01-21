@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Dropzone } from './components/composed/dropzone';
 import { PlotFigure } from './components/composed/plot-figure';
 import { Badge } from './components/ui/badge';
@@ -9,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from './components/ui/table';
+import { Button } from './components/ui/button';
 
 type Result = {
   disease: string;
@@ -103,6 +105,8 @@ const optimumConditions: OptimumConditions[] = [
 ];
 
 function Diagnose() {
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+
   function getBadgeColor(value: number) {
     if (value < 15) {
       return 'bg-blue-500 hover:bg-blue-700';
@@ -119,9 +123,48 @@ function Diagnose() {
     return 'bg-red-600 hover:bg-red-800';
   }
 
+  // HAICI
+  async function callApi(){
+    const api_endpoint = "http://localhost:8000/diagnose"
+
+    if (!selectedFile) {
+      alert("BA INCARCA IAIC")
+    }
+
+    const formData = new FormData();
+    formData.append('file', selectedFile as Blob);
+
+    fetch(api_endpoint, {
+      method: 'POST',
+      body: formData,
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    }).then(response => response.json())
+    .then(data => {
+      console.log(data);
+    })
+    .catch(error => {
+      console.error(error)
+    })
+  }
+
+  async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
+    if (event.target.files) {
+      setSelectedFile(event.target.files[0]);
+    }
+  }
+
   return (
     <>
       <h1 className='text-5xl font-bold mb-16'>Diagnose</h1>
+      <div>
+      <Button variant='default' className='mb-32 text-lg font-bold py-6 px-8' onClick={callApi}>
+        Try with your data
+      </Button>
+      <br />
+      <input type="file" onChange={handleFileChange} accept='.csv' />
+      </div>
       <Dropzone />
       <section className='my-16'>
         <h2 className='text-3xl font-bold mt-16 mb-8 text-left'>Results</h2>
