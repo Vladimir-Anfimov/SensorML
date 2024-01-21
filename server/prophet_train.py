@@ -61,7 +61,7 @@ class ProphetPredictor:
             )
         return models
 
-    def predict_column(self, new_df, column, trained_model, periods=48):
+    def predict_column(self, new_df, column, trained_model, periods=4 * 7 * 24):
         model = Prophet()
         model.fit(
             new_df[["Timestamp", column]]
@@ -71,7 +71,7 @@ class ProphetPredictor:
         )
 
         future = model.make_future_dataframe(
-            periods=periods, freq="H", include_history=True
+            periods=periods, freq="H", include_history=False
         )
         forecast = model.predict(future)
 
@@ -82,7 +82,18 @@ class ProphetPredictor:
         for i, (model, forecast) in enumerate(models):
             column = df.columns[i + 1]
             plt.figure(figsize=(10, 6))
-            model.plot(forecast, xlabel="Data", ylabel=column)
+            plt.plot(
+                df.iloc[8 * 7 * 24 :]["Timestamp"],
+                df.iloc[8 * 7 * 24 :][column],
+                "#181818",
+                label="Your values",
+            )
+            plt.plot(
+                forecast["ds"],
+                forecast["yhat"],
+                "#0072B2",
+                label="Predicted values",
+            )
             plt.legend()
             plt.title(f"Prognoza pentru parametrul {column}")
             figs.append(plt.gcf())
@@ -114,7 +125,8 @@ if __name__ == "__main__":
     train_df = df.iloc[:cuttoff]
     test_df = df.iloc[cuttoff:]
     predictor = ProphetPredictor(train_df)
+    # models = predictor.train()
     models = predictor.load(train_df)
-    predictor.save(train_df, models)
+    # predictor.save(train_df, models)
     user_models = predictor.predict(test_df, models)
     predictor.generate_plots(test_df, user_models)
