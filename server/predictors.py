@@ -6,6 +6,9 @@ from seq2seq_train import Seq2SeqNeuralNetwork
 from params import OUTPUT_SIZE, RAW_PARAMS_NAMES, WINDOW_SIZE
 from data_frames import FrameLoader
 from preproccessing import normalize
+from sklearn.metrics import mean_squared_error
+import matplotlib.pyplot as plt
+import os
 
 
 class Predictor:
@@ -41,7 +44,7 @@ class Predictor:
 
         # insereaza la inceputul dataframe-ului o coloana cu timestamp-uri
         df.insert(0, 'Timestamp', 0)
-        df['Timestamp'] = pd.date_range(start=start_timestamp, periods=len(df), freq='H')
+        df['Timestamp'] = pd.date_range(start=start_timestamp, periods=len(df), freq='h')
         
         df = df.drop(['sin_month', 'cos_month', 'sin_day', 'cos_day', 'sin_hour', 'cos_hour'], axis=1)
 
@@ -75,7 +78,17 @@ class Seq2SeqPredictorNormalized(Predictor):
 if __name__ == '__main__':
     dataframe_loader = FrameLoader(FrameLoader.RAW)
     df = dataframe_loader.load()
-    df = df[:30]
+    df = df[:336]
     predictor = Seq2SeqPredictorNormalized()
-    predicted = predictor.predict(df, 2)
-    print(predicted)
+    predicted = predictor.predict(df, 128)
+
+    save_dir = 'images/seq2seq/'
+    os.makedirs(save_dir, exist_ok=True)
+
+    for column in predicted.columns[1:]:
+        plt.figure(figsize=(10, 6))
+        plt.plot(df['Timestamp'], df[column].astype('float32'), 'g.', label='Expected values')
+        plt.plot(predicted['Timestamp'], predicted[column].astype('float32'), 'b.', label='Predicted values')
+        plt.legend()
+        plt.title(f'Forecast for the parameter \'{column}\' using LSTM')
+        plt.savefig(f'images/seq2seq/seq2seq{column}.png')
