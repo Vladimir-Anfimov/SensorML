@@ -13,7 +13,7 @@ WINDOW_SIZE = 7
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, df, expected_column, window_size=WINDOW_SIZE, output_size=OUTPUT_SIZE):
         self.x = df.values
-        self.y = df[expected_column].values
+        self.y = df.values
         self.window_size = window_size
         self.output_size = output_size
 
@@ -34,7 +34,7 @@ class Seq2Seq(torch.nn.Module):
         self.output_size = output_size
         self.encoder = torch.nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
         self.decoder = torch.nn.LSTM(hidden_size, hidden_size, num_layers, batch_first=True)
-        self.fc = torch.nn.Linear(hidden_size, output_size)
+        self.fc = torch.nn.Linear(hidden_size, output_size * len(NORMALIZED_PARAMS_NAMES))
 
     def forward(self, x):
         h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).requires_grad_().to(device)
@@ -42,6 +42,7 @@ class Seq2Seq(torch.nn.Module):
         encoder_out, (hn, cn) = self.encoder(x, (h0.detach(), c0.detach()))
         decoder_out, (hn, cn) = self.decoder(encoder_out, (h0.detach(), c0.detach()))
         out = self.fc(decoder_out[:, -1, :])
+        out = out.view(-1, self.output_size, len(NORMALIZED_PARAMS_NAMES))
         return out
     
 
@@ -53,7 +54,6 @@ def train(model, dataloader, criterion, optimizer, num_epochs=2):
         for seq, labels in dataloader:
             optimizer.zero_grad()
             output = model(seq)
-
             loss = criterion(output, labels)
             loss.backward()
             optimizer.step()
