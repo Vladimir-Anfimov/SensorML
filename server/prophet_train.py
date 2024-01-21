@@ -6,6 +6,22 @@ import pandas as pd
 
 from data_frames import FrameLoader
 
+friendly_names = {
+    "pres": "Pressure",
+    "temp1": "Temperature in point A",
+    "umid": "Humidity",
+    "temp2": "Temperature in point B",
+    "V450": "Voltage at 450nm",
+    "B500": "Blue at 500nm",
+    "G550": "Green at 550nm",
+    "Y570": "Yellow at 570nm",
+    "O600": "Orange at 600nm",
+    "R650": "Red at 650nm",
+    "temps1": "Soil Temperature in point A",
+    "temps2": "Soil Temperature in point B",
+    "lumina": "Light",
+}
+
 
 class ProphetPredictor:
     def __init__(self, df) -> None:
@@ -95,7 +111,9 @@ class ProphetPredictor:
                 label="Predicted values",
             )
             plt.legend()
-            plt.title(f"Prognoza pentru parametrul {column}")
+            plt.title(friendly_names[column])
+            plt.xlabel("Date")
+            plt.ylabel(friendly_names[column])
             figs.append(plt.gcf())
 
         # save figures
@@ -142,4 +160,3 @@ if __name__ == "__main__":
     # predictor.generate_plots(test_df, user_models)
 
     plots = ProphetPredictor.get_plots(test_df)
-    
