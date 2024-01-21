@@ -1,35 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import './App.css';
+import { useState } from 'react';
+import { PlotFigure } from './components/composed/plot-figure';
+import { Button } from './components/ui/button';
+import { useNavigate } from 'react-router-dom';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const navigate = useNavigate();
+
+  const models = ['Prophet', 'LSTM', 'Seq2Seq'];
+  const [model, setModel] = useState(models[0]);
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
+      <h1 className='text-5xl font-bold mb-8 mt-16'>How are your tomatoes?</h1>
+      <p className='text-xl mb-16'>
+        Check out our app to check the health of your tomatoes. <br />
+        We trained our models on 2 years worth of data so you can see how
+        healthy are your tomatoes.
       </p>
+      <Button
+        variant='default'
+        className='mb-32 text-lg font-bold py-6 px-8'
+        onClick={() => navigate('/diagnose')}
+      >
+        Try with your data
+      </Button>
+      <div className='flex flex-col items-center mb-8'>
+        <PlotFigure
+          className='mb-8'
+          model={model}
+          setModel={setModel}
+          models={models}
+        />
+        <PlotFigure
+          className='mb-8'
+          model={model}
+          setModel={setModel}
+          models={models}
+        />
+        <PlotFigure
+          className='mb-8'
+          model={model}
+          setModel={setModel}
+          models={models}
+        />
+        <PlotFigure
+          className='mb-8'
+          model={model}
+          setModel={setModel}
+          models={models}
+        />
+      </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
