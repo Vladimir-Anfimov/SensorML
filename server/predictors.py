@@ -90,5 +90,5 @@ if __name__ == '__main__':
         plt.plot(df['Timestamp'], df[column].astype('float32'), 'g.', label='Expected values')
         plt.plot(predicted['Timestamp'], predicted[column].astype('float32'), 'b.', label='Predicted values')
         plt.legend()
-        plt.title(f'Forecast for the parameter \'{column}\' using LSTM')
-        plt.savefig(f'images/seq2seq/seq2seq{column}.png')
+        plt.title(f'Forecast for the parameter \'{column}\' using Seq2Seq')
+        plt.savefig(f'images/seq2seq/seq2seq_{column}.png')
