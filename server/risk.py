@@ -102,9 +102,9 @@ def compute_risk_helper(
     return len(df[(df["temp1"] >= low) & (df["temp1"] <= high)]), len(df)
 
 
-df = FrameLoader(FrameLoader.RAW).load()
-cutoff = df.shape[0] // 2
-uploaded_df = df.iloc[:cutoff]
-forecast_df = df.iloc[cutoff:]
-
-compute_risk(uploaded_df, forecast_df)
+# df = FrameLoader(FrameLoader.RAW).load()
+# cutoff = df.shape[0] // 2
+# uploaded_df = df.iloc[:cutoff]
+# forecast_df = df.iloc[cutoff:]
+#
+# compute_risk(uploaded_df, forecast_df)
