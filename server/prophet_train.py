@@ -117,6 +117,16 @@ class ProphetPredictor:
                 models.append(model_from_json(f.read()))
         return models
 
+    @staticmethod
+    def get_plots(uploaded_df):
+        df = FrameLoader(FrameLoader.RAW).load()
+        df["Timestamp"] = pd.to_datetime(df["Timestamp"])
+
+        predictor = ProphetPredictor(df)
+        models = predictor.load(train_df)
+        user_models = predictor.predict(test_df, models)
+        return predictor.generate_plots(test_df, user_models)
+
 
 if __name__ == "__main__":
     df = FrameLoader(FrameLoader.RAW).load()
@@ -124,9 +134,11 @@ if __name__ == "__main__":
     cuttoff = int(len(df) * 0.8)
     train_df = df.iloc[:cuttoff]
     test_df = df.iloc[cuttoff:]
-    predictor = ProphetPredictor(train_df)
-    # models = predictor.train()
-    models = predictor.load(train_df)
-    # predictor.save(train_df, models)
-    user_models = predictor.predict(test_df, models)
-    predictor.generate_plots(test_df, user_models)
+    # predictor = ProphetPredictor(train_df)
+    # # models = predictor.train()
+    # models = predictor.load(train_df)
+    # # predictor.save(train_df, models)
+    # user_models = predictor.predict(test_df, models)
+    # predictor.generate_plots(test_df, user_models)
+
+    ProphetPredictor.get_plots(test_df)
