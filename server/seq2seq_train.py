@@ -2,28 +2,27 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 from data_frames import FrameLoader
+from torch.utils.data.dataset import random_split
 
-from params import NORMALIZED_PARAMS_NAMES
+from params import NORMALIZED_PARAMS_NAMES, OUTPUT_SIZE, WINDOW_SIZE
 
 device = torch.device('cpu')
 
-OUTPUT_SIZE = 30
-WINDOW_SIZE = 7
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, df, expected_column, window_size=WINDOW_SIZE, output_size=OUTPUT_SIZE):
-        self.x = df.values
-        self.y = df.values
+    def __init__(self, df, window_size=WINDOW_SIZE, output_size=OUTPUT_SIZE):
+        self.df = df
         self.window_size = window_size
         self.output_size = output_size
 
     def __len__(self):
-        return len(self.x) - self.window_size - self.output_size
+        return len(self.df) - self.window_size - self.output_size + 1
     
 
     def __getitem__(self, idx):
-        return (torch.tensor(self.x[idx:idx + self.window_size], dtype=torch.float32, device=device),
-                torch.tensor(self.y[idx + self.window_size: idx + self.window_size + self.output_size], dtype=torch.float32, device=device))
+        x = self.df[idx:idx+self.window_size].to_numpy()
+        y = self.df[idx+self.window_size:idx+self.window_size+self.output_size].to_numpy()
+        return torch.tensor(x, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
     
 
 class Seq2SeqNeuralNetwork(torch.nn.Module):
@@ -48,8 +47,7 @@ class Seq2SeqNeuralNetwork(torch.nn.Module):
 
 
 
-def train(model, dataloader, criterion, optimizer, num_epochs=2):
-
+def train(model, dataloader, criterion, optimizer, num_epochs):
     for epoch in range(num_epochs):
         for seq, labels in dataloader:
             optimizer.zero_grad()
@@ -61,7 +59,6 @@ def train(model, dataloader, criterion, optimizer, num_epochs=2):
         print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
 
 
-
 def test(model, dataloader, criterion):
     with torch.no_grad():
         for i, (x, y) in enumerate(dataloader):
@@ -70,28 +67,31 @@ def test(model, dataloader, criterion):
             print(f'Error: {error.item():.4f}')
 
 
+    
 if __name__ == '__main__':
-    PREDICTED_COLUMN = 'pres'
-
     dataframe_loader = FrameLoader(FrameLoader.NORMALIZED)
     df = dataframe_loader.load()
-    dataset = Dataset(df, PREDICTED_COLUMN)
-    dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
+    
+    dataframe_loader = FrameLoader(FrameLoader.NORMALIZED)
+    df = dataframe_loader.load()
+    dataset = Dataset(df)
+
+    train_size = int(len(dataset) * 0.8)
+    test_size = len(dataset) - train_size
+
+    train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
+    dataloader_train = DataLoader(train_dataset, batch_size=8, shuffle=True)
+    dataloader_test = DataLoader(test_dataset, batch_size=len(test_dataset), shuffle=True)
 
     model = Seq2SeqNeuralNetwork()
-
     criterion = torch.nn.L1Loss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
-    train(model, dataloader, criterion, optimizer)
+    train(model, dataloader_train, criterion, optimizer, num_epochs=5)
 
-    test_dataloader = DataLoader(dataset, batch_size=len(dataset), shuffle=False)
+    test(model, dataloader_test, criterion)
 
-    test(model, test_dataloader, criterion)
-
-    raise Exception('Choose a path to save the model')
-    # torch.save(model.state_dict(), './models/seq2seq.pth')
-
+    torch.save(model.state_dict(), './models/seq2seq/seq2seq_normalized.pth')
 
     
 

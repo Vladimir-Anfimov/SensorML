@@ -12,5 +12,6 @@ class FrameLoader:
 
         self.type = type
 
+
     def load(self):
         return pd.read_csv(self.type) 

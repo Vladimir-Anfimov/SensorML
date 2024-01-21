@@ -33,12 +33,15 @@ def normalize(df):
 
     df[columns_to_normalize] = scaler.fit_transform(df[columns_to_normalize])
 
-    print(df.head())
+    # df.to_csv('./data/normalized_data.csv', index=False)
 
-    df.to_csv('./data/normalized_data.csv', index=False)
+    return df
 
 
 
 if __name__ == '__main__':
+    input_verification = input('Are you sure you want to normalize the data? (y/n): ')
+    if input_verification != 'y':
+        exit(0)
     df = load()
     normalize(df)

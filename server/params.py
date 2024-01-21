@@ -5,3 +5,7 @@ RAW_PARAMS_NAMES = ['Timestamp','pres','temp1','umid','temp2','V450','B500','G55
 
 
 FILTERED_PARAMS = ['Y570', 'B500', 'lumina', 'R650', 'temp2', 'G550', 'O600', 'temps2']
+
+
+OUTPUT_SIZE = 1
+WINDOW_SIZE = 30
