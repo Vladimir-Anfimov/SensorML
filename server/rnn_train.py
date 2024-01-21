@@ -12,7 +12,7 @@ WINDOW_SIZE = 7
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, df, expected_column, window_size=WINDOW_SIZE, output_size=OUTPUT_SIZE):
-        self.x = df.drop(expected_column, axis=1).values
+        self.x = df.values
         self.y = df[expected_column].values
         self.window_size = window_size
         self.output_size = output_size
@@ -27,7 +27,7 @@ class Dataset(torch.utils.data.Dataset):
 
 
 class RecurentNeuralNetwork(torch.nn.Module):
-    def __init__(self, input_size=18, hidden_size=32, num_layers=2, output_size=OUTPUT_SIZE):
+    def __init__(self, input_size=19, hidden_size=32, num_layers=2, output_size=OUTPUT_SIZE):
         super(RecurentNeuralNetwork, self).__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
@@ -92,7 +92,7 @@ def start(PREDICTED_COLUMN):
 
     train(model, dataloader, criterion, optimizer, epochs=5)
 
-    torch.save(model.state_dict(), f'./models/lstm/{PREDICTED_COLUMN}-OS_{OUTPUT_SIZE}-WS_{WINDOW_SIZE}.pth')
+    torch.save(model.state_dict(), f'./models/lstm/{PREDICTED_COLUMN}-OS-{OUTPUT_SIZE}-WS-{WINDOW_SIZE}.pth')
 
     test_dataloader = DataLoader(dataset, batch_size=len(dataset), shuffle=False)
 

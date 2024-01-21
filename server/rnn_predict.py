@@ -2,28 +2,29 @@ import math
 import pandas as pd
 import torch
 from data_frames import FrameLoader
-from rnn_train import RecurentNeuralNetwork
+from multivar_rnn import MultiVarRNN
 
-model_path = "./models/lstm/pres_OS30_WS7.pth"
-
-model = RecurentNeuralNetwork()
-model.load_state_dict(torch.load(model_path))
-model.eval()
 
 PREDICTED_COLUMN = 'pres'
 
 dataframe_loader = FrameLoader(FrameLoader.NORMALIZED)
 df = dataframe_loader.load()
-df.drop(columns=[PREDICTED_COLUMN], inplace=True)
 data = df.head(7).values
 
-total_days = 40
+# total_days = 40
 predictions = torch.tensor(data, dtype=torch.float32)
 
-for i in range((total_days//model.output_size)):
-    new_prediction = model(predictions[-7:].unsqueeze(0))
-    print(predictions.shape, new_prediction.shape)
-    exit()
-    predictions = torch.cat((predictions, new_prediction))
+multiVarRNN = MultiVarRNN(MultiVarRNN.ALL)
+new_prediction = multiVarRNN.get_prediction_vector(predictions.unsqueeze(0))
+print(new_prediction.shape)
 
-print(predictions, predictions.shape)
+print()
+
+print(new_prediction)
+
+
+# for i in range(math.ceil(total_days//30)):
+#     print(predictions.shape, new_prediction.shape)
+#     predictions = torch.cat((predictions, new_prediction))
+
+# print(predictions, predictions.shape)
