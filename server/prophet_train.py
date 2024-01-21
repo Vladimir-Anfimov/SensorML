@@ -124,7 +124,7 @@ class ProphetPredictor:
 
         predictor = ProphetPredictor(df)
         models = predictor.load(train_df)
-        user_models = predictor.predict(test_df, models)
+        user_models = predictor.predict(uploaded_df, models)
         return predictor.generate_plots(test_df, user_models)
 
 
@@ -141,4 +141,5 @@ if __name__ == "__main__":
     # user_models = predictor.predict(test_df, models)
     # predictor.generate_plots(test_df, user_models)
 
-    ProphetPredictor.get_plots(test_df)
+    plots = ProphetPredictor.get_plots(test_df)
+    
