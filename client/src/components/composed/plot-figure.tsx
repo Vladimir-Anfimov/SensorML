@@ -9,34 +9,41 @@ import {
 } from '../ui/dropdown-menu';
 import { Button } from '../ui/button';
 import { ChevronsUpDown } from 'lucide-react';
+import { useState } from 'react';
 
 type PlotFigureProps = {
   className?: string;
-  model: string;
-  setModel: (model: string) => void;
-  models: string[];
+  filepaths: Map<string, string>;
 };
 
+const models = ['Prophet', 'LSTM', 'Seq2Seq'];
+
 function PlotFigure(props: PlotFigureProps) {
-  const { className, model, setModel, models } = props;
+  const { className, filepaths } = props;
+  const [model, setModel] = useState(models[0]);
 
   return (
     <div
       className={`relative inline-block pt-10 rounded border border-gray-700 shadow ${className}`}
     >
-      <img src={'./public/images/prophet-pres.png'} alt={model} />
+      <img src={filepaths.get(model)} alt={model} />
       <ChooseModelDropdown
         className='absolute top-2 right-2'
         model={model}
         setModel={setModel}
-        models={models}
       />
     </div>
   );
 }
 
-function ChooseModelDropdown(props: PlotFigureProps) {
-  const { className, model, setModel, models } = props;
+type ChooseModelDropdownProps = {
+  className?: string;
+  model: string;
+  setModel: (model: string) => void;
+};
+
+function ChooseModelDropdown(props: ChooseModelDropdownProps) {
+  const { className, model, setModel } = props;
 
   return (
     <div className={`${className}`}>

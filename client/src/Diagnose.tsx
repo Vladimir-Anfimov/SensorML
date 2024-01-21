@@ -124,11 +124,11 @@ function Diagnose() {
   }
 
   // HAICI
-  async function callApi(){
-    const api_endpoint = "http://localhost:8000/diagnose"
+  async function callApi() {
+    const api_endpoint = 'http://localhost:8000/diagnose';
 
     if (!selectedFile) {
-      alert("BA INCARCA IAIC")
+      alert('BA INCARCA IAIC');
     }
 
     const formData = new FormData();
@@ -138,15 +138,16 @@ function Diagnose() {
       method: 'POST',
       body: formData,
       headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-    }).then(response => response.json())
-    .then(data => {
-      console.log(data);
+        'Content-Type': 'multipart/form-data',
+      },
     })
-    .catch(error => {
-      console.error(error)
-    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error(error);
+      });
   }
 
   async function handleFileChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -159,11 +160,15 @@ function Diagnose() {
     <>
       <h1 className='text-5xl font-bold mb-16'>Diagnose</h1>
       <div>
-      <Button variant='default' className='mb-32 text-lg font-bold py-6 px-8' onClick={callApi}>
-        Try with your data
-      </Button>
-      <br />
-      <input type="file" onChange={handleFileChange} accept='.csv' />
+        <Button
+          variant='default'
+          className='mb-32 text-lg font-bold py-6 px-8'
+          onClick={callApi}
+        >
+          Try with your data
+        </Button>
+        <br />
+        <input type='file' onChange={handleFileChange} accept='.csv' />
       </div>
       <Dropzone />
       <section className='my-16'>
@@ -259,9 +264,13 @@ function Diagnose() {
         </h2>
         <PlotFigure
           className='mb-8'
-          model={'Prophet'}
-          setModel={() => {}}
-          models={['Prophet', 'LSTM', 'Seq2Seq']}
+          filepaths={
+            new Map([
+              ['Prophet', './public/images/prophet1.png'],
+              ['LSTM', './public/images/prophet2.png'],
+              ['Seq2Seq', './public/images/prophet3.png'],
+            ])
+          }
         />
       </section>
     </>
