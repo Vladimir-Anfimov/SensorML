@@ -1,3 +1,4 @@
+import warnings
 from prophet import Prophet
 from prophet.serialize import model_to_json, model_from_json
 import matplotlib.pyplot as plt
@@ -5,6 +6,9 @@ import numpy as np
 import pandas as pd
 
 from data_frames import FrameLoader
+
+
+warnings.filterwarnings("ignore", category=Warning, module='prophet')
 
 friendly_names = {
     "pres": "Pressure",
@@ -95,8 +99,14 @@ class ProphetPredictor:
 
     def generate_plots(self, df, models):
         figs: list[plt.Figure] = []
+        risk_df = pd.DataFrame()
+
         for i, (model, forecast) in enumerate(models):
             column = df.columns[i + 1]
+
+            if column == "temp1" or column == "temp2" or column == "pres":
+                risk_df[column] = forecast["yhat"]
+
             plt.figure(figsize=(10, 6))
             plt.plot(
                 df.iloc[8 * 7 * 24 :]["Timestamp"],
@@ -116,10 +126,7 @@ class ProphetPredictor:
             plt.ylabel(friendly_names[column])
             figs.append(plt.gcf())
 
-        # save figures
-        for i, fig in enumerate(figs):
-            fig.savefig(f"./images/prophet_{i}.png", bbox_inches="tight")
-        return figs
+        return figs, risk_df
 
     def save(self, df, models):
         for i, (model) in enumerate(models):
@@ -136,14 +143,15 @@ class ProphetPredictor:
         return models
 
     @staticmethod
-    def get_plots(uploaded_df):
+    def get_plots_and_df(uploaded_df):
         df = FrameLoader(FrameLoader.RAW).load()
         df["Timestamp"] = pd.to_datetime(df["Timestamp"])
 
         predictor = ProphetPredictor(df)
-        models = predictor.load(train_df)
+        models = predictor.load(df)
         user_models = predictor.predict(uploaded_df, models)
-        return predictor.generate_plots(test_df, user_models)
+
+        return predictor.generate_plots(uploaded_df, user_models)
 
 
 if __name__ == "__main__":
