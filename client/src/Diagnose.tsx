@@ -1,4 +1,5 @@
 import { Dropzone } from './components/composed/dropzone';
+import { PlotFigure } from './components/composed/plot-figure';
 import { Badge } from './components/ui/badge';
 import {
   Table,
@@ -208,6 +209,17 @@ function Diagnose() {
             </TableRow>
           </TableBody>
         </Table>
+      </section>
+      <section className='my-16'>
+        <h2 className='text-3xl font-bold mt-16 mb-8 text-left'>
+          Here is how we think your tomatoes will do
+        </h2>
+        <PlotFigure
+          className='mb-8'
+          model={'Prophet'}
+          setModel={() => {}}
+          models={['Prophet', 'LSTM', 'Seq2Seq']}
+        />
       </section>
     </>
   );
