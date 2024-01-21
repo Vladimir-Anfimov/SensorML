@@ -3,7 +3,7 @@ from rnn_train import RecurentNeuralNetwork
 from params import NORMALIZED_PARAMS_NAMES
 
 
-class MultiVarRNN:
+class MultiVarRNNIterate:
     ALL = 'all'
     FEATURE_SELECTED = 'feature_selected'
 

@@ -11,7 +11,7 @@ OUTPUT_SIZE = 30
 WINDOW_SIZE = 7
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, df, expected_column, window_size=WINDOW_SIZE, output_size=OUTPUT_SIZE):
+    def __init__(self, df, window_size=WINDOW_SIZE, output_size=OUTPUT_SIZE):
         self.x = df.values
         self.y = df.values
         self.window_size = window_size
@@ -24,42 +24,36 @@ class Dataset(torch.utils.data.Dataset):
     def __getitem__(self, idx):
         return (torch.tensor(self.x[idx:idx + self.window_size], dtype=torch.float32, device=device),
                 torch.tensor(self.y[idx + self.window_size: idx + self.window_size + self.output_size], dtype=torch.float32, device=device))
-    
 
-class Seq2Seq(torch.nn.Module):
+
+class RecurentNeuralNetwork(torch.nn.Module):
     def __init__(self, input_size=19, hidden_size=32, num_layers=2, output_size=OUTPUT_SIZE):
-        super(Seq2Seq, self).__init__()
+        super(RecurentNeuralNetwork, self).__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.output_size = output_size
-        self.encoder = torch.nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
-        self.decoder = torch.nn.LSTM(hidden_size, hidden_size, num_layers, batch_first=True)
+        self.lstm = torch.nn.LSTM(input_size, hidden_size, num_layers, batch_first=True)
         self.fc = torch.nn.Linear(hidden_size, output_size * len(NORMALIZED_PARAMS_NAMES))
 
     def forward(self, x):
         h0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).requires_grad_().to(device)
         c0 = torch.zeros(self.num_layers, x.size(0), self.hidden_size).requires_grad_().to(device)
-        encoder_out, (hn, cn) = self.encoder(x, (h0.detach(), c0.detach()))
-        decoder_out, (hn, cn) = self.decoder(encoder_out, (h0.detach(), c0.detach()))
-        out = self.fc(decoder_out[:, -1, :])
+        out, (hn, cn) = self.lstm(x, (h0.detach(), c0.detach()))
+        out = self.fc(out[:, -1, :])
         out = out.view(-1, self.output_size, len(NORMALIZED_PARAMS_NAMES))
         return out
     
 
-
-
-def train(model, dataloader, criterion, optimizer, num_epochs=2):
-
-    for epoch in range(num_epochs):
-        for seq, labels in dataloader:
+def train(model, dataloader, criterion, optimizer, epochs=10):
+    for epoch in range(epochs):
+        for i, (x, y) in enumerate(dataloader):
             optimizer.zero_grad()
-            output = model(seq)
-            loss = criterion(output, labels)
+            output = model(x)
+            loss = criterion(output, y)
             loss.backward()
             optimizer.step()
 
-        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
-
+        print(f'Epoch: {epoch + 1}')
 
 
 def test(model, dataloader, criterion):
@@ -70,27 +64,21 @@ def test(model, dataloader, criterion):
             print(f'Error: {error.item():.4f}')
 
 
+    
 if __name__ == '__main__':
-    PREDICTED_COLUMN = 'pres'
-
     dataframe_loader = FrameLoader(FrameLoader.NORMALIZED)
     df = dataframe_loader.load()
-    dataset = Dataset(df, PREDICTED_COLUMN)
-    dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
-
-    model = Seq2Seq()
-
+    
+    model = RecurentNeuralNetwork().to(device)
     criterion = torch.nn.L1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    dataset = Dataset(df)
+    dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
 
-    train(model, dataloader, criterion, optimizer)
+    train(model, dataloader, criterion, optimizer, epochs=5)
+
+    torch.save(model.state_dict(), f'./models/lstm-multivar/lstm-multivar.pth')
 
     test_dataloader = DataLoader(dataset, batch_size=len(dataset), shuffle=False)
 
     test(model, test_dataloader, criterion)
-
-    torch.save(model.state_dict(), './models/seq2seq-multivar/seq2seq-multivar.pth')
-
-
-    
-

@@ -92,7 +92,7 @@ def start(PREDICTED_COLUMN):
 
     train(model, dataloader, criterion, optimizer, epochs=5)
 
-    torch.save(model.state_dict(), f'./models/lstm/{PREDICTED_COLUMN}-OS-{OUTPUT_SIZE}-WS-{WINDOW_SIZE}.pth')
+    torch.save(model.state_dict(), f'./models/lstm-univar/{PREDICTED_COLUMN}-OS-{OUTPUT_SIZE}-WS-{WINDOW_SIZE}.pth')
 
     test_dataloader = DataLoader(dataset, batch_size=len(dataset), shuffle=False)
 
