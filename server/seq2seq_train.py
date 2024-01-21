@@ -26,9 +26,9 @@ class Dataset(torch.utils.data.Dataset):
                 torch.tensor(self.y[idx + self.window_size: idx + self.window_size + self.output_size], dtype=torch.float32, device=device))
     
 
-class Seq2Seq(torch.nn.Module):
+class Seq2SeqNeuralNetwork(torch.nn.Module):
     def __init__(self, input_size=19, hidden_size=32, num_layers=2, output_size=OUTPUT_SIZE):
-        super(Seq2Seq, self).__init__()
+        super(Seq2SeqNeuralNetwork, self).__init__()
         self.hidden_size = hidden_size
         self.num_layers = num_layers
         self.output_size = output_size
@@ -78,7 +78,7 @@ if __name__ == '__main__':
     dataset = Dataset(df, PREDICTED_COLUMN)
     dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
 
-    model = Seq2Seq()
+    model = Seq2SeqNeuralNetwork()
 
     criterion = torch.nn.L1Loss()
     optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
@@ -89,7 +89,8 @@ if __name__ == '__main__':
 
     test(model, test_dataloader, criterion)
 
-    torch.save(model.state_dict(), './models/seq2seq.pth')
+    raise Exception('Choose a path to save the model')
+    # torch.save(model.state_dict(), './models/seq2seq.pth')
 
 
     
