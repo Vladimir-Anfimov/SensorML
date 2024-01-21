@@ -1,4 +1,5 @@
 from lstm_train import RecurentNeuralNetwork
-from params import NORMALIZED_PARAMS_NAMES, RAW_PARAMS_NAMES
+from params import *
 from data_frames import FrameLoader
 from seq2seq_train import Seq2SeqNeuralNetwork
+from preproccessing import normalize

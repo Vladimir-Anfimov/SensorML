@@ -18,6 +18,7 @@ class FrameLoader:
 
         self.type = type
 
+
     def load(self):
         df = pd.read_csv(self.type)
         df.dropna(inplace=True)

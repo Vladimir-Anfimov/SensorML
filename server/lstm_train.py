@@ -2,28 +2,28 @@ import pandas as pd
 import torch
 from torch.utils.data import DataLoader
 from data_frames import FrameLoader
+from torch.utils.data.dataset import random_split
 
-from params import NORMALIZED_PARAMS_NAMES
+from params import NORMALIZED_PARAMS_NAMES, OUTPUT_SIZE, WINDOW_SIZE
 
 device = torch.device('cpu')
 
-OUTPUT_SIZE = 30
-WINDOW_SIZE = 7
+
 
 class Dataset(torch.utils.data.Dataset):
     def __init__(self, df, window_size=WINDOW_SIZE, output_size=OUTPUT_SIZE):
-        self.x = df.values
-        self.y = df.values
+        self.df = df
         self.window_size = window_size
         self.output_size = output_size
 
     def __len__(self):
-        return len(self.x) - self.window_size - self.output_size
+        return len(self.df) - self.window_size - self.output_size + 1
     
 
     def __getitem__(self, idx):
-        return (torch.tensor(self.x[idx:idx + self.window_size], dtype=torch.float32, device=device),
-                torch.tensor(self.y[idx + self.window_size: idx + self.window_size + self.output_size], dtype=torch.float32, device=device))
+        x = self.df[idx:idx+self.window_size].to_numpy()
+        y = self.df[idx+self.window_size:idx+self.window_size+self.output_size].to_numpy()
+        return torch.tensor(x, dtype=torch.float32), torch.tensor(y, dtype=torch.float32)
 
 
 class RecurentNeuralNetwork(torch.nn.Module):
@@ -44,16 +44,16 @@ class RecurentNeuralNetwork(torch.nn.Module):
         return out
     
 
-def train(model, dataloader, criterion, optimizer, epochs=10):
-    for epoch in range(epochs):
-        for i, (x, y) in enumerate(dataloader):
+def train(model, dataloader, criterion, optimizer, num_epochs):
+    for epoch in range(num_epochs):
+        for seq, labels in dataloader:
             optimizer.zero_grad()
-            output = model(x)
-            loss = criterion(output, y)
+            output = model(seq)
+            loss = criterion(output, labels)
             loss.backward()
             optimizer.step()
 
-        print(f'Epoch: {epoch + 1}')
+        print(f'Epoch [{epoch+1}/{num_epochs}], Loss: {loss.item():.4f}')
 
 
 def test(model, dataloader, criterion):
@@ -69,17 +69,23 @@ if __name__ == '__main__':
     dataframe_loader = FrameLoader(FrameLoader.NORMALIZED)
     df = dataframe_loader.load()
     
-    model = RecurentNeuralNetwork().to(device)
-    criterion = torch.nn.L1Loss()
-    optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+    dataframe_loader = FrameLoader(FrameLoader.NORMALIZED)
+    df = dataframe_loader.load()
     dataset = Dataset(df)
-    dataloader = DataLoader(dataset, batch_size=8, shuffle=True)
 
-    train(model, dataloader, criterion, optimizer, epochs=5)
+    train_size = int(len(dataset) * 0.8)
+    test_size = len(dataset) - train_size
 
-    raise Exception('Choose a path to save the model')
-    # torch.save(model.state_dict(), f'./models/lstm.pth')
+    train_dataset, test_dataset = random_split(dataset, [train_size, test_size])
+    dataloader_train = DataLoader(train_dataset, batch_size=8, shuffle=True)
+    dataloader_test = DataLoader(test_dataset, batch_size=len(test_dataset), shuffle=True)
 
-    test_dataloader = DataLoader(dataset, batch_size=len(dataset), shuffle=False)
+    model = RecurentNeuralNetwork()
+    criterion = torch.nn.L1Loss()
+    optimizer = torch.optim.Adam(model.parameters(), lr=1e-4)
 
-    test(model, test_dataloader, criterion)
+    train(model, dataloader_train, criterion, optimizer, num_epochs=5)
+
+    test(model, dataloader_test, criterion)
+
+    torch.save(model.state_dict(), './models/lstm/lstm_normalized.pth')
