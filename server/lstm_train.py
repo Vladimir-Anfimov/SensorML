@@ -77,7 +77,7 @@ if __name__ == '__main__':
 
     train(model, dataloader, criterion, optimizer, epochs=5)
 
-    torch.save(model.state_dict(), f'./models/lstm-multivar/lstm-multivar.pth')
+    torch.save(model.state_dict(), f'./models/lstm.pth')
 
     test_dataloader = DataLoader(dataset, batch_size=len(dataset), shuffle=False)
 
