@@ -2,12 +2,20 @@ import { FileIcon } from 'lucide-react';
 import { useCallback, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
-function Dropzone() {
+type DropzoneProps = {
+  onFileUpload: (file: File) => void;
+};
+
+function Dropzone(props: DropzoneProps) {
   const [file, setFile] = useState<File | null>(null);
 
-  const onDrop = useCallback((acceptedFiles: File[]) => {
-    setFile(acceptedFiles[0]);
-  }, []);
+  const onDrop = useCallback(
+    (acceptedFiles: File[]) => {
+      setFile(acceptedFiles[0]);
+      props.onFileUpload(acceptedFiles[0]);
+    },
+    [props],
+  );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
