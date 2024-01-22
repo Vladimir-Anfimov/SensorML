@@ -4,7 +4,7 @@ import pandas as pd
 
 def compute_risk(
     given_df: pd.DataFrame, forecast_df: pd.DataFrame
-) -> list[tuple]:
+) -> list[tuple[str, int]]:
     diseases = [
         {
             "name": "EarlyBlight",
@@ -57,7 +57,6 @@ def compute_risk(
             )
         )
 
-    print(ans)
     return ans
 
 
