@@ -13,7 +13,7 @@ import {
 } from './components/ui/table';
 import { Button } from './components/ui/button';
 
-type Result = {
+type Risks = {
   disease: string;
   prophet: number;
   lstm: number;
@@ -106,7 +106,7 @@ const optimumConditions: OptimumConditions[] = [
 ];
 
 function Diagnose() {
-  const [results, setResults] = useState<Result[]>([]);
+  const [risks, setRisks] = useState<Risks[]>([]);
 
   function getBadgeColor(value: number) {
     if (value < 15) {
@@ -127,7 +127,7 @@ function Diagnose() {
   async function callApi(file: File) {
     const data = await getData(file);
 
-    setResults(data.risks);
+    setRisks(data.risks);
   }
 
   return (
@@ -149,7 +149,7 @@ function Diagnose() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {results.map((result) => (
+            {risks.map((result) => (
               <TableRow key={result.disease}>
                 <TableCell className='w-[6rem] text-left'>
                   {result.disease}
