@@ -5,3 +5,4 @@ from seq2seq_train import Seq2SeqNeuralNetwork
 from preproccessing import normalize
 from prophet_train import ProphetPredictor
 from risk import compute_risk
+from generate_plots import PlotsGenerator
