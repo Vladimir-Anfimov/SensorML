@@ -12,6 +12,7 @@ uvicorn api:app
 - Client
 ```console
 cd client
+npm install
 npm run dev
 # press "o + <Enter>" to open in the brower
 # alternatively you can type http://localhost:5173 in the browser
