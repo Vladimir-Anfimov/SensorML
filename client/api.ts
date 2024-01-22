@@ -1,12 +1,20 @@
-type Risk = [string, number];
+type Risk = {
+  disease: string;
+  prophet: number;
+  lstm: number;
+  seq2seq: number;
+  overall: number;
+};
 
 type Data = {
   images: string[];
-  risk: Risk[];
 };
 
 type PlotData = {
   prophet: Data;
+  lstm: Data;
+  seq2seq: Data;
+  risks: Risk[];
 };
 
 async function getData(file: File): Promise<PlotData> {

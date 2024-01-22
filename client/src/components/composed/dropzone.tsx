@@ -7,11 +7,8 @@ type DropzoneProps = {
 };
 
 function Dropzone(props: DropzoneProps) {
-  const [file, setFile] = useState<File | null>(null);
-
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      setFile(acceptedFiles[0]);
       props.onFileUpload(acceptedFiles[0]);
     },
     [props],
@@ -34,7 +31,10 @@ function Dropzone(props: DropzoneProps) {
         >
           <input {...getInputProps()} />
           {isDragActive ? (
-            <p>Drop the files here ...</p>
+            <>
+              <FileIcon className='mx-auto h-16 w-16 mb-4 ' color='#555' />
+              <p>Drop the files here ...</p>
+            </>
           ) : (
             <>
               <FileIcon className='mx-auto h-16 w-16 mb-4 ' color='#555' />
@@ -43,7 +43,6 @@ function Dropzone(props: DropzoneProps) {
           )}
         </div>
       </form>
-      <p>{file?.name}</p>
     </>
   );
 }
