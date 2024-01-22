@@ -94,10 +94,10 @@ function Diagnose() {
     if (value < 30) {
       return 'bg-green-500 hover:bg-green-700';
     }
-    if (value < 50) {
+    if (value < 45) {
       return 'bg-yellow-500 hover:bg-yellow-600';
     }
-    if (value < 75) {
+    if (value < 60) {
       return 'bg-orange-500 hover:bg-orange-600';
     }
     return 'bg-red-600 hover:bg-red-800';
